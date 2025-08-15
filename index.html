@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>小球碰撞模拟库示例</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+    }
+
+    #simCanvas {
+      border: 1px solid #ccc;
+    }
+
+    button {
+      margin: 5px;
+      padding: 5px 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="simCanvas" width="1600" height="900"></canvas>
+  <div id="killFeed" style="margin-top: 10px; padding: 10px; border: 1px solid #ccc; height: 150px; width: 200px; overflow-y: auto;">
+  </div>
+  <div>
+    <button id="startBtn">开始</button>
+    <button id="stopBtn">停止</button>
+    <button id="addBallBtn">添加小球</button>
+  </div>
+
+  <script src="bcs.js"></script>
+  <script>
+    // 获取Canvas元素
+    const canvas = document.getElementById('simCanvas');
+
+    // 创建模拟器实例
+    const simulator = new BallCollisionSimulator(canvas, {
+      colors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFBE0B']
+    });
+
+    // 监听击杀事件并更新播报
+    simulator.onKill = (killInfo) => {
+      const killFeedElement = document.getElementById('killFeed');
+
+      // 创建播报条目
+      const killEntry = document.createElement('div');
+      killEntry.style.margin = '5px 0';
+      killEntry.innerHTML = `
+    <span style="color: ${killInfo.killerColor}; font-weight: bold;">●</span>
+    击杀了
+    <span style="color: ${killInfo.victimColor}; font-weight: bold;">●</span>
+  ，剩余<span style="font-weight: bold">${killInfo.ballsNumber}</span>球`;
+
+      // 添加到播报区域顶部
+      if (killFeedElement.firstChild) {
+        killFeedElement.insertBefore(killEntry, killFeedElement.firstChild);
+      } else {
+        killFeedElement.appendChild(killEntry);
+      }
+
+      // 限制播报数量
+      if (killFeedElement.children.length > 10) {
+        killFeedElement.removeChild(killFeedElement.lastChild);
+      }
+    };
+
+    // 添加初始小球
+    // simulator.addBall({
+    //   radius: 50,
+    //   mass: 5,
+    //   x: 100,
+    //   y: 200,
+    //   vx: 4,
+    //   vy: 4
+    // });
+
+    // simulator.addBall({
+    //   radius: 50,
+    //   mass: 5,
+    //   x: 400,
+    //   y: 200,
+    //   vx: -6,
+    //   vy: -20
+    // });
+
+    // simulator.addBall({
+    //   radius: 50,
+    //   mass: 5,
+    //   x: 200,
+    //   y: 200,
+    //   vx: 8,
+    //   vy: 10
+    // });
+
+    // 开始模拟
+    simulator.start();
+
+    // 按钮事件
+    document.getElementById('startBtn').addEventListener('click', () => simulator.start());
+    document.getElementById('stopBtn').addEventListener('click', () => simulator.stop());
+
+    document.getElementById('addBallBtn').addEventListener('click', () => {
+      // 添加随机小球
+      var color = 'rgb(' + Math.round(Math.random() * 255) + ',' + Math.round(Math.random() * 255) + ',' + Math.round(Math.random() * 255) + ')'
+      console.log(color)
+      simulator.addBall({
+        radius: 50,
+        mass: 5,
+        vx: (Math.random() * 20 - 3),
+        vy: (Math.random() * 20 - 3),
+        color: color
+      });
+    });
+
+    const knife = new Image()
+    knife.src = 'knife.png';
+    simulator.setKnifeImage(knife)
+  </script>
+</body>
+
+</html>
