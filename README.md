@@ -6,7 +6,7 @@
 
 ### 直接体验
 
-访问
+访问 https://jason4zh.github.io/BallsCrash/
 
 ### 基础用法
 
@@ -157,4 +157,5 @@ canvas.addEventListener('click', (e) => {
 });
 
 ```
+
 
