@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>小球碰撞模拟库示例</title>
+  <title>小球碰撞</title>
   <style>
     body {
       margin: 0;
@@ -22,7 +22,7 @@
 
 <body>
   <canvas id="simCanvas" width="900" height="900"></canvas>
-  <div id="killFeed" style="margin-top: 10px; padding: 10px; border: 1px solid #ccc; height: 150px; width: 200px; overflow-y: auto;">
+  <div id="killFeed" style="margin-top: 10px; padding: 10px; border: 1px solid #ccc; height: 150px; width: 300px; overflow-y: auto;">
   </div>
   <div>
     <button id="startBtn">开始</button>
@@ -34,7 +34,8 @@
   <script>
     // 获取Canvas元素
     const canvas = document.getElementById('simCanvas');
-
+    canvas.width = (window.innerWidth-100).toString()
+    canvas.height = (window.innerHeight-200).toString()
     // 创建模拟器实例
     const simulator = new BallCollisionSimulator(canvas, {
       colors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFBE0B']
@@ -48,9 +49,9 @@
       const killEntry = document.createElement('div');
       killEntry.style.margin = '5px 0';
       killEntry.innerHTML = `
-    <span style="color: ${killInfo.killerColor}; font-weight: bold;">●</span>
+    <span style="color: ${killInfo.killerColor}; font-weight: bold;font-size: 30px;">●</span>
     击杀了
-    <span style="color: ${killInfo.victimColor}; font-weight: bold;">●</span>
+    <span style="color: ${killInfo.victimColor}; font-weight: bold;font-size: 30px;">●</span>
   ，剩余<span style="font-weight: bold">${killInfo.ballsNumber}</span>球`;
 
       // 添加到播报区域顶部
@@ -106,10 +107,10 @@
       var color = 'rgb(' + Math.round(Math.random() * 255) + ',' + Math.round(Math.random() * 255) + ',' + Math.round(Math.random() * 255) + ')'
       console.log(color)
       simulator.addBall({
-        radius: 50,
-        mass: 5,
-        vx: (Math.random() * 20 - 3),
-        vy: (Math.random() * 20 - 3),
+        radius: 60,
+        mass: 6,
+        vx: (Math.random() * 30),
+        vy: (Math.random() * 30),
         color: color
       });
     });
@@ -117,6 +118,8 @@
     const knife = new Image()
     knife.src = 'knife.png';
     simulator.setKnifeImage(knife)
+
+    
   </script>
 </body>
 

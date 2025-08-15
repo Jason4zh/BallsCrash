@@ -448,4 +448,24 @@ class BallCollisionSimulator {
     this.knife.img = img;
     this._placeKnifeRandomly();
   }
+
+  reduceBoxSize(way,size){
+    if(this.box.height>0&&this.box.width>0){
+      switch(way){
+        case "box":
+          this.box.width -= size;
+          this.box.height -= size;
+          break;
+        case "vert":
+          this.box.height -= size;
+          break;
+        case "hori":
+          this.box.width -= size;
+          break;
+      }
+    }else{
+      return 0;
+    }
+  }
+
 }
