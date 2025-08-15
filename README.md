@@ -1,4 +1,4 @@
-# 小球碰撞模拟器 (BallCollisionSimulator)
+# 小球碰撞模拟器
 
 一个优雅的小球碰撞物理模拟库，可在浏览器中实现真实的小球碰撞效果，支持自定义物理参数和交互控制。
 
@@ -157,5 +157,6 @@ canvas.addEventListener('click', (e) => {
 });
 
 ```
+
 
 
