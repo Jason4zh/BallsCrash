@@ -50,8 +50,6 @@ new BallCollisionSimulator(canvasElement, options)
 | 属性 | 类型 | 默认值 | 描述 |
 |------|------|--------|------|
 | `colors` | `Array<string>` | `['#3498db', '#e74c3c', '#2ecc71', '#f39c12']` | 小球颜色数组，用于自动分配颜色 |
-| `friction` | `number` | `0.99` | 摩擦系数（0-1之间，值越小摩擦越大） |
-| `restitution` | `number` | `0.8` | 弹性系数（0-1之间，值越大弹性越好） |
 
 ### 核心方法
 
@@ -61,13 +59,13 @@ new BallCollisionSimulator(canvasElement, options)
 **参数：**
 ```javascript
 {
-  radius?: number,  // 半径（默认：20）
-  mass?: number,    // 质量（默认：1）
-  x?: number,       // x坐标（未指定则随机）
-  y?: number,       // y坐标（未指定则随机）
-  vx?: number,      // x轴速度（默认：0）
-  vy?: number,      // y轴速度（默认：0）
-  color?: string    // 颜色值（未指定则自动分配）
+  radius: number,  // 半径（默认：20）
+  mass: number,    // 质量（默认：1）
+  x: number,       // x坐标（未指定则随机）
+  y: number,       // y坐标（未指定则随机）
+  vx: number,      // x轴速度（默认：0）
+  vy: number,      // y轴速度（默认：0）
+  color: string    // 颜色值（未指定则自动分配）
 }
 ```
 
@@ -159,3 +157,4 @@ canvas.addEventListener('click', (e) => {
 });
 
 ```
+
