@@ -15,7 +15,8 @@ class BallCollisionSimulator {
       y: 0,
       width: 50,
       height: 50,
-      available: true
+      available: true,
+
     };
 
     this.heart = {
@@ -24,7 +25,8 @@ class BallCollisionSimulator {
       y: 0,
       width: 50,
       height: 50,
-      available: true
+      available: true,
+
     };
 
     // 方框边界
@@ -49,12 +51,17 @@ class BallCollisionSimulator {
       firstradius: 60
     };
 
+    this.originalBoxSize = {
+      width: this.box.width,
+      height: this.box.height
+    };
+
     // 初始化
     this._setupCanvas();
-    this._placeKnifeRandomly();
-    this._placeHeartRandomly()
-  }
+    this.placeKnifeRandomly();
+    this.placeHeartRandomly()
 
+  }
   /**
    * 初始化画布
    */
@@ -76,7 +83,7 @@ class BallCollisionSimulator {
   /**
    * 随机放置小刀
    */
-  _placeKnifeRandomly() {
+  placeKnifeRandomly() {
     if (!this.knife.img) return;
 
     this.knife.x = Math.random() * (this.box.width - this.knife.width) + this.box.x;
@@ -84,7 +91,7 @@ class BallCollisionSimulator {
     this.knife.available = true;
   }
 
-  _placeHeartRandomly() {
+  placeHeartRandomly() {
     if (!this.heart.img) return;
 
     this.heart.x = Math.random() * (this.box.width - this.heart.width) + this.box.x;
@@ -119,49 +126,57 @@ class BallCollisionSimulator {
     );
   }
 
-  /**
-   * 检测小球与小刀的碰撞
-   */
   _checkToolCollision() {
+    // 分别检测小刀和爱心，互不影响
+    this._checkKnifeCollision();
+    this._checkHeartCollision();
+  }
+
+  // 单独检测小刀碰撞
+  _checkKnifeCollision() {
     if (!this.knife.available || !this.knife.img) return;
 
-    if (!this.heart.available || !this.heart.img) return;
-
     for (const ball of this.balls) {
-
-      // 简单的矩形与圆形碰撞检测
       const kX = Math.max(this.knife.x, Math.min(ball.x, this.knife.x + this.knife.width));
       const kY = Math.max(this.knife.y, Math.min(ball.y, this.knife.y + this.knife.height));
-
-      const hX = Math.max(this.heart.x, Math.min(ball.x, this.heart.x + this.heart.width));
-      const hY = Math.max(this.heart.y, Math.min(ball.y, this.heart.y + this.heart.height));
-
       const distkX = ball.x - kX;
       const distkY = ball.y - kY;
-
-      const disthX = ball.x - hX;
-      const disthY = ball.y - hY;
-
       const distancek = Math.sqrt(distkX * distkX + distkY * distkY);
-      const distanceh = Math.sqrt(disthX * disthX + disthY * disthY);
 
       if (distancek <= ball.radius) {
         ball.hasKnife = true;
         this.knife.available = false;
-        this._placeKnifeRandomly();
-        break;
-      }
-
-      if (distanceh <= ball.radius) {
-        console.log(ball.mass)
-        ball.mass = Math.min(ball.mass + 1, ball.firstmass)
-        ball.radius = Math.min(ball.radius + 10, ball.firstradius)
-        this.heart.available = false;
-        this._placeHeartRandomly();
+        setTimeout(() => {
+          this.placeKnifeRandomly()
+        }, 100);
         break;
       }
     }
   }
+
+  // 单独检测爱心碰撞
+  _checkHeartCollision() {
+    if (!this.heart.available || !this.heart.img) return;
+
+    for (const ball of this.balls) {
+      const hX = Math.max(this.heart.x, Math.min(ball.x, this.heart.x + this.heart.width));
+      const hY = Math.max(this.heart.y, Math.min(ball.y, this.heart.y + this.heart.height));
+      const disthX = ball.x - hX;
+      const disthY = ball.y - hY;
+      const distanceh = Math.sqrt(disthX * disthX + disthY * disthY);
+
+      if (distanceh <= ball.radius) {
+        ball.mass = Math.min(ball.mass + 1, ball.firstmass);
+        ball.radius = Math.min(ball.radius + 10, ball.firstradius);
+        this.heart.available = false;
+        setTimeout(() => {
+          this.placeHeartRandomly()
+        }, 5000);
+        break;
+      }
+    }
+  }
+
 
   /**
    * 添加小球
@@ -239,8 +254,8 @@ class BallCollisionSimulator {
   reset() {
     this.clearBalls();
     this._setupCanvas();
-    this._placeKnifeRandomly();
-    this._placeHeartRandomly();
+    this.placeKnifeRandomly();
+    this.placeHeartRandomly();
   }
 
   /**
@@ -363,7 +378,7 @@ class BallCollisionSimulator {
    * 处理小刀效果
    */
   _handleKnifeEffect(ball1, ball2) {
-    
+
     // 情况1: ball1有刀，ball2没有
     if (ball1.hasKnife && !ball2.hasKnife) {
       // 减少ball2的质量和半径
@@ -439,6 +454,7 @@ class BallCollisionSimulator {
     this._drawBalls();
     this._checkBallDie();
 
+
     this.animationId = requestAnimationFrame(() => this._animate());
   }
 
@@ -448,6 +464,7 @@ class BallCollisionSimulator {
   start() {
     if (!this.animationId) {
       this._animate();
+
     }
   }
 
@@ -458,6 +475,7 @@ class BallCollisionSimulator {
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
       this.animationId = null;
+      clearInterval(this.interval)
     }
   }
 
@@ -473,33 +491,86 @@ class BallCollisionSimulator {
    */
   setKnifeImage(img) {
     this.knife.img = img;
-    this._placeKnifeRandomly();
+    this.placeKnifeRandomly();
   }
 
   setHeartImage(img) {
     this.heart.img = img;
-    this._placeHeartRandomly();
+    this.placeHeartRandomly();
   }
 
 
 
   reduceBoxSize(way, size) {
-    if (this.box.height > 0 && this.box.width > 0) {
+    // 保存当前box的中心点
+    const centerX = this.box.x + this.box.width / 2;
+    const centerY = this.box.y + this.box.height / 2;
+
+    // 计算新尺寸
+    const newWidth = way === "hori" || way === "box" ? this.box.width - size : this.box.width;
+    const newHeight = way === "vert" || way === "box" ? this.box.height - size : this.box.height;
+
+    // 最小尺寸限制
+    const minSize = 100;
+    if (newWidth > minSize && newHeight > minSize) {
+      // 调整方框边界（保持中心点不变）
       switch (way) {
         case "box":
-          this.box.width -= size;
-          this.box.height -= size;
+          this.box.width = newWidth;
+          this.box.height = newHeight;
+          this.box.x = centerX - newWidth / 2;
+          this.box.y = centerY - newHeight / 2;
           break;
         case "vert":
-          this.box.height -= size;
+          this.box.height = newHeight;
+          this.box.y = centerY - newHeight / 2;
           break;
         case "hori":
-          this.box.width -= size;
+          this.box.width = newWidth;
+          this.box.x = centerX - newWidth / 2;
           break;
       }
-    } else {
-      return 0;
-    }
-  }
 
+      // // 刷新道具位置
+      // this.placeKnifeRandomly();
+      // this.placeHeartRandomly();
+
+      return true;
+    }
+    return false;
+  }
+  increaseBoxSize(way, size) {
+    const centerX = this.box.x + this.box.width / 2;
+    const centerY = this.box.y + this.box.height / 2;
+
+    const newWidth = way === "hori" || way === "box" ? this.box.width + size : this.box.width;
+    const newHeight = way === "vert" || way === "box" ? this.box.height + size : this.box.height;
+
+    // 不超过原始尺寸
+    if (newWidth <= this.originalBoxSize.width && newHeight <= this.originalBoxSize.height) {
+      switch (way) {
+        case "box":
+          this.box.width = newWidth;
+          this.box.height = newHeight;
+          this.box.x = centerX - newWidth / 2;
+          this.box.y = centerY - newHeight / 2;
+          break;
+        case "vert":
+          this.box.height = newHeight;
+          this.box.y = centerY - newHeight / 2;
+          break;
+        case "hori":
+          this.box.width = newWidth;
+          this.box.x = centerX - newWidth / 2;
+          break;
+      }
+
+      // this.placeKnifeRandomly();
+      // this.placeHeartRandomly();
+
+
+      return true;
+    }
+    return false;
+  }
 }

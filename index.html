@@ -22,20 +22,23 @@
 
 <body>
   <canvas id="simCanvas" width="900" height="900"></canvas>
-  <div id="killFeed" style="margin-top: 10px; padding: 10px; border: 1px solid #ccc; height: 150px; width: 300px; overflow-y: auto;">
+  <div id="killFeed"
+    style="margin-top: 10px; padding: 10px; border: 1px solid #ccc; height: 150px; width: 300px; overflow-y: auto;">
   </div>
   <div>
     <button id="startBtn">开始</button>
     <button id="stopBtn">停止</button>
     <button id="addBallBtn">添加小球</button>
+    <button id="decreaseBtn">缩小区域</button>
+    <button id="increaseBtn">增大区域</button>
   </div>
 
   <script src="bcs.js"></script>
   <script>
     // 获取Canvas元素
     const canvas = document.getElementById('simCanvas');
-    canvas.width = (window.innerWidth-100).toString()
-    canvas.height = (window.innerHeight-100).toString()
+    canvas.width = (window.innerWidth - 100).toString()
+    canvas.height = (window.innerHeight - 100).toString()
     // 创建模拟器实例
     const simulator = new BallCollisionSimulator(canvas, {
       colors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFBE0B']
@@ -53,7 +56,7 @@
     击杀了
     <span style="color: ${killInfo.victimColor}; font-weight: bold;font-size: 30px;">●</span>
   ，剩余<span style="font-weight: bold">${killInfo.ballsNumber}</span>球。`;
-      if (killInfo.ballsNumber == 1){
+      if (killInfo.ballsNumber == 1) {
         killEntry.innerHTML += `<span style="color: ${killInfo.killerColor}; font-weight: bold;font-size: 30px;">●</span>赢了`
       }
       // 添加到播报区域顶部
@@ -62,11 +65,20 @@
       } else {
         killFeedElement.appendChild(killEntry);
       }
+      if (killInfo.ballsNumber == 3){
+        interval = setInterval(()=>{
+          simulator.reduceBoxSize("box",1)
+        },20)
+        setTimeout(() => {
+          clearInterval(interval)
+          simulator.placeKnifeRandomly()
+          simulator.placeHeartRandomly()
+        }, 12000);
+      }
 
-      
     };
 
-    const t = (window.innerHeight-100)*(window.innerWidth-100)/50000
+    const t = (window.innerHeight - 100) * (window.innerWidth - 100) / 50000
 
     // 按钮事件
     document.getElementById('startBtn').addEventListener('click', () => simulator.start());
@@ -92,6 +104,7 @@
     const heart = new Image()
     heart.src = 'heart.png';
     simulator.setHeartImage(heart)
+
   </script>
 </body>
 
