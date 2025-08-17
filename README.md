@@ -7,7 +7,7 @@
 
 ### 直接体验
 
-访问
+访问https://jason4zh.github.io/BCS/以开始
 
 ### 基础用法
 
@@ -158,4 +158,5 @@ canvas.addEventListener('click', (e) => {
     vy: (Math.random() - 0.5) * 3
   });
 });
+
 ```
