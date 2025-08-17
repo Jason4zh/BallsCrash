@@ -63,16 +63,16 @@
       } else {
         killFeedElement.appendChild(killEntry);
       }
-      if (killInfo.ballsNumber == 3){
-        const interval = setInterval(()=>{
-          var size = simulator.reduceBoxSize("box",1)
-          if(Math.min(size[0],size[1])<=250){
+      if (killInfo.ballsNumber == 3) {
+        const interval = setInterval(() => {
+          var size = simulator.reduceBoxSize("box", 1)
+          if (Math.min(size[0], size[1]) <= 250) {
             clearInterval(interval);
             simulator.placeKnifeRandomly()
             simulator.placeHeartRandomly()
           }
-        },20)
-        
+        }, 20)
+
       }
 
     };
@@ -90,8 +90,8 @@
       simulator.addBall({
         radius: 60,
         mass: 6,
-        vx: (Math.random() * t),
-        vy: (Math.random() * t),
+        vx: (Math.random() * t / 2) + t / 2,
+        vy: (Math.random() * t / 2) + t / 2,
         color: color
       });
     });
