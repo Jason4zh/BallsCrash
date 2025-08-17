@@ -146,10 +146,7 @@ class BallCollisionSimulator {
       if (distancek <= ball.radius) {
         ball.hasKnife = true;
         this.knife.available = false;
-        setTimeout(() => {
-          this.placeKnifeRandomly()
-        }, 100);
-        break;
+        this.placeKnifeRandomly();
       }
     }
   }
@@ -531,13 +528,13 @@ class BallCollisionSimulator {
           break;
       }
 
-      // // 刷新道具位置
       // this.placeKnifeRandomly();
       // this.placeHeartRandomly();
 
-      return true;
+      return [this.box.width, this.box.height];
     }
-    return false;
+    return null;
+
   }
   increaseBoxSize(way, size) {
     const centerX = this.box.x + this.box.width / 2;
@@ -567,10 +564,8 @@ class BallCollisionSimulator {
 
       // this.placeKnifeRandomly();
       // this.placeHeartRandomly();
-
-
-      return true;
+      return [this.box.width, this.box.height];
     }
-    return false;
+    return null;
   }
 }

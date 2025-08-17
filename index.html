@@ -66,14 +66,15 @@
         killFeedElement.appendChild(killEntry);
       }
       if (killInfo.ballsNumber == 3){
-        interval = setInterval(()=>{
-          simulator.reduceBoxSize("box",1)
+        const interval = setInterval(()=>{
+          var size = simulator.reduceBoxSize("box",1)
+          if(Math.min(size[0],size[1])<=250){
+            clearInterval(interval);
+            simulator.placeKnifeRandomly()
+            simulator.placeHeartRandomly()
+          }
         },20)
-        setTimeout(() => {
-          clearInterval(interval)
-          simulator.placeKnifeRandomly()
-          simulator.placeHeartRandomly()
-        }, 12000);
+        
       }
 
     };
