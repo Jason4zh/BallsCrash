@@ -7,7 +7,7 @@
 
 ### 直接体验
 
-访问https://jason4zh.github.io/BCS/以开始
+访问 https://jason4zh.github.io/BCS/ 以开始
 
 ### 基础用法
 
@@ -160,3 +160,4 @@ canvas.addEventListener('click', (e) => {
 });
 
 ```
+
