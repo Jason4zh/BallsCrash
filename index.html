@@ -7,23 +7,109 @@
     body {
       margin: 0;
       padding: 20px;
+      font-family: Arial, sans-serif;
     }
 
     #simCanvas {
       border: 1px solid #ccc;
     }
 
+    /* 按钮美化样式 */
     button {
       margin: 5px;
-      padding: 5px 10px;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    #startBtn {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    #startBtn:hover {
+      background-color: #45a049;
+    }
+
+    #stopBtn {
+      background-color: #f44336;
+      color: white;
+    }
+
+    #stopBtn:hover {
+      background-color: #d32f2f;
+    }
+
+    #addBallBtn {
+      background-color: #2196F3;
+      color: white;
+    }
+
+    #addBallBtn:hover {
+      background-color: #0b7dda;
+    }
+
+    .info-container {
+      margin-top: 10px;
+      display: flex;
+      gap: 20px;
+    }
+
+    #killFeed {
+      padding: 10px;
+      border: 1px solid #ccc;
+      height: 150px;
+      width: 300px;
+      overflow-y: auto;
+      text-align: center;
+    }
+
+    #ballStats {
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+
+    #ballStats table {
+      border-collapse: collapse;
+      background-color: #fff;
+    }
+
+    #ballStats th, #ballStats td {
+      border: 1px solid #eee;
+      padding: 8px 12px;
+      text-align: center;
+    }
+
+    #ballStats th {
+      background-color: #f5f5f5;
+      font-weight: bold;
+      text-align: right; /* 表头右对齐 */
+    }
+
+    .color-indicator {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
     }
   </style>
 </head>
 
 <body>
   <canvas id="simCanvas" width="900" height="900"></canvas>
-  <div id="killFeed"
-    style="margin-top: 10px; padding: 10px; border: 1px solid #ccc; height: 150px; width: 300px; overflow-y: auto;">
+  <div class="info-container">
+    <div id="killFeed"></div>
+    <div id="ballStats">
+      <!-- 表头在左侧的表格 -->
+      <table>
+        <tbody id="ballStatsTable">
+          <!-- 动态填充数据 -->
+        </tbody>
+      </table>
+    </div>
   </div>
   <div>
     <button id="startBtn">开始</button>
@@ -35,75 +121,153 @@
   <script>
     // 获取Canvas元素
     const canvas = document.getElementById('simCanvas');
-    canvas.width = (window.innerWidth - 100).toString()
-    canvas.height = (window.innerHeight - 100).toString()
+    canvas.width = window.innerWidth - 100;
+    canvas.height = window.innerHeight - 100;
+    
     // 创建模拟器实例
     const simulator = new BallCollisionSimulator(canvas, {
       colors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFBE0B']
     });
 
-    // 监听击杀事件并更新播报
+    // 存储每个小球的击杀数
+    const killCounts = {};
+
+    // 更新小球属性表格（表头在左侧，按质量从高到低排序，已删除序号行）
+    function updateBallStats() {
+      const tableBody = document.getElementById('ballStatsTable');
+      tableBody.innerHTML = ''; // 清空表格
+
+      // 获取小球并按质量从高到低排序
+      const sortedBalls = simulator.getBalls().sort((a, b) => b.mass - a.mass);
+
+      // 定义要显示的表头（已移除序号）
+      const headers = ['颜色', '质量', '击杀数'];
+
+      // 为每个表头创建一行，左侧是表头文本，右侧是各小球对应的值
+      headers.forEach((header, headerIndex) => {
+        const row = document.createElement('tr');
+        
+        // 添加表头单元格（左侧）
+        const th = document.createElement('th');
+        th.textContent = header;
+        row.appendChild(th);
+        
+        // 为每个小球添加数据单元格（右侧）
+        sortedBalls.forEach((ball) => {
+          // 初始化击杀数
+          if (killCounts[ball.id] === undefined) {
+            killCounts[ball.id] = 0;
+          }
+
+          const td = document.createElement('td');
+          
+          // 根据表头类型显示不同内容（已移除序号相关逻辑）
+          switch(headerIndex) {
+            case 0: // 颜色
+              td.innerHTML = `<span class="color-indicator" style="background-color: ${ball.color};"></span>`;
+              break;
+            case 1: // 质量
+              td.textContent = ball.mass;
+              break;
+            case 2: // 击杀数
+              td.textContent = killCounts[ball.id];
+              break;
+          }
+          
+          row.appendChild(td);
+        });
+        
+        tableBody.appendChild(row);
+      });
+    }
+
+    // 监听击杀事件
     simulator.onKill = (killInfo) => {
       const killFeedElement = document.getElementById('killFeed');
 
-      // 创建播报条目
+      // 创建击杀播报
       const killEntry = document.createElement('div');
       killEntry.style.margin = '5px 0';
       killEntry.innerHTML = `
-    <span style="color: ${killInfo.killerColor}; font-weight: bold;font-size: 30px;">●</span>
-    击杀了
-    <span style="color: ${killInfo.victimColor}; font-weight: bold;font-size: 30px;">●</span>
-  ，剩余<span style="font-weight: bold">${killInfo.ballsNumber}</span>球。`;
-      if (killInfo.ballsNumber == 1) {
-        killEntry.innerHTML += `<span style="color: ${killInfo.killerColor}; font-weight: bold;font-size: 30px;">●</span>赢了`
-      }
-      // 添加到播报区域顶部
+        <span style="color: ${killInfo.killerColor}; font-size: 50px;">●</span>
+        击杀了
+        <span style="color: ${killInfo.victimColor}; font-size: 50px;">●</span>
+        ，剩余<span style="font-weight: bold">${killInfo.ballsNumber}</span>球。
+        ${killInfo.ballsNumber === 1 ? `<br><span style="color: ${killInfo.killerColor}; font-size: 20px;">●</span> 获胜！` : ''}
+      `;
+      
+      // 添加到顶部
       if (killFeedElement.firstChild) {
         killFeedElement.insertBefore(killEntry, killFeedElement.firstChild);
       } else {
         killFeedElement.appendChild(killEntry);
       }
-      if (killInfo.ballsNumber == 3) {
+      
+      // 缩小方框逻辑
+      if (killInfo.ballsNumber === 3) {
         const interval = setInterval(() => {
-          var size = simulator.reduceBoxSize("box", 1)
-          if (Math.min(size[0], size[1]) <= 250) {
+          const size = simulator.reduceBoxSize("box", 1);
+          if (size && Math.min(size[0], size[1]) <= 250) {
             clearInterval(interval);
-            simulator.placeKnifeRandomly()
-            simulator.placeHeartRandomly()
+            simulator.placeKnifeRandomly();
+            simulator.placeHeartRandomly();
           }
-        }, 20)
-
+        }, 20);
       }
 
+      // 更新击杀数
+      const killerBall = simulator.getBalls().find(ball => ball.color === killInfo.killerColor);
+      if (killerBall) {
+        killCounts[killerBall.id] = (killCounts[killerBall.id] || 0) + 1;
+      }
+
+      // 更新表格
+      updateBallStats();
     };
 
-    const t = (window.innerHeight - 100) * (window.innerWidth - 100) / 50000
+    // 计算速度系数
+    const t = (window.innerHeight - 100) * (window.innerWidth - 100) / 50000;
 
     // 按钮事件
     document.getElementById('startBtn').addEventListener('click', () => simulator.start());
     document.getElementById('stopBtn').addEventListener('click', () => simulator.stop());
 
     document.getElementById('addBallBtn').addEventListener('click', () => {
-      // 添加随机小球
-      var color = 'rgb(' + Math.round(Math.random() * 255) + ',' + Math.round(Math.random() * 255) + ',' + Math.round(Math.random() * 255) + ')'
-      console.log(color)
-      simulator.addBall({
+      // 生成随机颜色
+      const color = `rgb(${Math.round(Math.random() * 255)}, ${Math.round(Math.random() * 255)}, ${Math.round(Math.random() * 255)})`;
+      
+      // 添加小球
+      const ballId = simulator.addBall({
         radius: 60,
         mass: 6,
         vx: (Math.random() * t / 2) + t / 2,
         vy: (Math.random() * t / 2) + t / 2,
         color: color
       });
+      
+      // 初始化击杀数
+      killCounts[ballId] = 0;
+      updateBallStats();
     });
 
-    const knife = new Image()
+    // 重写动画循环以实时更新表格
+    const originalAnimate = simulator._animate;
+    simulator._animate = function() {
+      originalAnimate.call(this);
+      updateBallStats();
+    };
+
+    // 加载道具图片
+    const knife = new Image();
     knife.src = 'knife.png';
-    simulator.setKnifeImage(knife)
+    simulator.setKnifeImage(knife);
 
-    const heart = new Image()
+    const heart = new Image();
     heart.src = 'heart.png';
-    simulator.setHeartImage(heart)
+    simulator.setHeartImage(heart);
 
+    // 初始化表格
+    updateBallStats();
   </script>
 </body>
 
