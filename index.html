@@ -189,11 +189,11 @@
       const killEntry = document.createElement('div');
       killEntry.style.margin = '5px 0';
       killEntry.innerHTML = `
-        <span style="color: ${killInfo.killerColor}; font-size: 50px;">●</span>
+        <span style="color: ${killInfo.killerColor}; font-size: 40px;">●</span>
         击杀了
-        <span style="color: ${killInfo.victimColor}; font-size: 50px;">●</span>
+        <span style="color: ${killInfo.victimColor}; font-size: 40px;">●</span>
         ，剩余<span style="font-weight: bold">${killInfo.ballsNumber}</span>球。
-        ${killInfo.ballsNumber === 1 ? `<br><span style="color: ${killInfo.killerColor}; font-size: 20px;">●</span> 获胜！` : ''}
+        ${killInfo.ballsNumber === 1 ? `<br><span style="color: ${killInfo.killerColor}; font-size: 40px;">●</span> 获胜！` : ''}
       `;
       
       // 添加到顶部
@@ -270,5 +270,6 @@
     updateBallStats();
   </script>
 </body>
+
 
 </html>
